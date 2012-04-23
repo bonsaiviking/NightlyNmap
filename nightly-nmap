@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -x
+NMAP=/usr/local/bin/nmap
+NMAPOUT=lan-cron-$(date +%F)
+NMAPLAST=last-nmap-scan
+
+cd /root/nmap
+rm nmap-details.sh
+
+$NMAP -v --open -T4 -oX $NMAPOUT.xml 192.168.1.0/24
+
+/usr/bin/python ndiffdetails.py --diffout $NMAPOUT.diff --cmdout nmap-details.sh \
+    $NMAPLAST $NMAPOUT.xml
+
+/bin/sh nmap-details.sh $NMAPOUT-details
+/bin/rm $NMAPLAST
+/bin/ln -s $NMAPOUT.xml $NMAPLAST
